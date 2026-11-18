@@ -1,0 +1,35 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+resources:
+- ../../sandbox/ingress
+patches:
+- patch: |-
+    - op: replace
+      path: /metadata/name
+      value: argocd-wagtailspace02-tls
+    - op: replace
+      path: /spec/secretName
+      value: argocd-wagtailspace02-tls
+    - op: replace
+      path: /spec/dnsNames
+      value:
+        - argocd.wagtailspace02.scaf.sixfeetup.com
+  target:
+    kind: Certificate
+    name: argocd-sandbox-wagtailspace02-tls
+- patch: |-
+    - op: replace
+      path: /metadata/name
+      value: argocd-wagtailspace02
+    - op: replace
+      path: /spec/routes/0/match
+      value: Host(`argocd.wagtailspace02.scaf.sixfeetup.com`)
+    - op: replace
+      path: /spec/routes/1/match
+      value: Host(`argocd.wagtailspace02.scaf.sixfeetup.com`) && Headers(`Content-Type`, `application/grpc`)
+    - op: replace
+      path: /spec/tls
+      value: argocd-wagtailspace02-tls
+  target:
+    kind: IngressRoute
+    name: argocd-sandbox-wagtailspace02
+kind: Kustomization

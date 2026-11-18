@@ -1,0 +1,54 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ../base
+- ../mailhog
+- ./postgres.yaml
+- ./secrets.yaml
+
+patches:
+- patch: |-
+    - op: add
+      path: /spec/template/spec/initContainers/0/env
+      value:
+        - name: POSTGRES_HOST
+          value: postgres
+    - op: replace
+      path: /spec/template/spec/containers/0/livenessProbe
+      value: null
+    - op: replace
+      path: /spec/template/spec/containers/0/readinessProbe
+      value: null
+  target:
+    kind: Deployment
+    name: backend
+- patch: |-
+    - op: add
+      path: /spec/template/spec/containers/0/env
+      value:
+        - name: DOCKER_GATEWAY_IP # used for debugger to reach out to host machine
+          value: "172.17.0.1"
+    - op: add
+      path: /spec/template/spec/containers/0/ports/-
+      value:
+        name: debugpy
+        containerPort: 5678
+  target:
+    kind: Deployment
+    name: backend
+# Debugger config is local-only so it can never reach sandbox/prod.
+# To debug, set PYTHONBREAKPOINT below; leave it "" to disable.
+- patch: |-
+    - op: add
+      path: /data/PYTHONBREAKPOINT
+      value: "" # "utils.pycharm_debugger" for pycharm, "wagtailspace02.utils.vscode_debugger" for vscode
+    - op: add
+      path: /data/PYDEVD_USE_CYTHON
+      value: "NO"
+    - op: add
+      path: /data/PYDEVD_USE_FRAME_EVAL
+      value: "NO"
+  target:
+    kind: ConfigMap
+    name: app-config

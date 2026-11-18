@@ -1,0 +1,74 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: wagtailspace02-prod
+
+resources:
+  - ../sandbox
+
+patches:
+- target:
+    kind: SealedSecret
+    name: secrets-config
+  path: secrets.yaml
+- patch: |-
+    - op: replace
+      path: /spec/issuerRef/name
+      value: letsencrypt-prod
+    - op: replace
+      path: /spec/dnsNames
+      value:
+        - api.prod.wagtailspace02.scaf.sixfeetup.com
+        - k8s.prod.wagtailspace02.scaf.sixfeetup.com
+
+  target:
+    kind: Certificate
+    name: cluster-cert
+- patch: |-
+    - op: replace
+      path: /metadata/annotations/cert-manager.io~1cluster-issuer
+      value: letsencrypt-prod
+    - op: replace
+      path: /spec/routes/0/match
+      value: Host(`api.prod.wagtailspace02.scaf.sixfeetup.com`)
+  target:
+    kind: IngressRoute
+    name: backend-ingress
+- patch: |-
+    - op: replace
+      path: /metadata/annotations/cert-manager.io~1cluster-issuer
+      value: letsencrypt-prod
+    - op: replace
+      path: /spec/routes/0/match
+      value: Host(`k8s.prod.wagtailspace02.scaf.sixfeetup.com`)
+  target:
+    kind: IngressRoute
+    name: k8s-ingress
+- patch: |-
+    - op: replace
+      path: /spec/backup/barmanObjectStore/destinationPath
+      value: "s3://wagtailspace02-prod-backups/"
+  target:
+    kind: Cluster
+    name: postgres
+
+
+configMapGenerator:
+  - name: app-config
+    behavior: merge
+    literals:
+     - ENVIRONMENT="production"
+     - DJANGO_SETTINGS_MODULE="config.settings.production"
+     - DJANGO_AWS_STORAGE_BUCKET_NAME="wagtailspace02-prod-static-storage"
+     - DJANGO_CSRF_TRUSTED_ORIGINS="https://api.prod.wagtailspace02.scaf.sixfeetup.com"
+
+     - AWS_S3_CUSTOM_DOMAIN="prod.wagtailspace02.scaf.sixfeetup.com"
+
+     - CMS_BACKEND_BASE_URL="https://api.prod.wagtailspace02.scaf.sixfeetup.com"
+     - CMS_PUBLIC_BASE_URL="https://api.prod.wagtailspace02.scaf.sixfeetup.com"
+
+
+images:
+  - name: 381492128493.dkr.ecr.us-east-1.amazonaws.com/wagtailspace02-sandbox-backend
+    newName: 381492128493.dkr.ecr.us-east-1.amazonaws.com/wagtailspace02-backend
+    newTag: latest
+

@@ -1,0 +1,17 @@
+argon2-cffi
+crispy-bootstrap5
+daphne
+django
+
+wagtail
+nh3
+
+
+django-allauth
+django-crispy-forms
+django-environ
+django-model-utils
+django-redis
+Pillow
+urllib3
+
