@@ -3,11 +3,11 @@ kind: Kustomization
 namespace: wagtailspace02-sandbox
 
 resources:
-  - ../base
-  - certificate.yaml
-  - ingress-route.yaml
-  - postgres.cnpg.yaml
-  - secrets.yaml
+- ../base
+- certificate.yaml
+- ingress-route.yaml
+- postgres.cnpg.yaml
+- secrets.yaml
 
 patches:
 - patch: |-
@@ -79,23 +79,22 @@ patches:
     name: backend
 
 
+
+
 configMapGenerator:
-  - name: app-config
-    behavior: merge
-    literals:
-     - ENVIRONMENT="sandbox"
-     - DJANGO_SETTINGS_MODULE="config.settings.production"
-     - DJANGO_AWS_STORAGE_BUCKET_NAME="wagtailspace02-sandbox-static-storage"
-     - DJANGO_CSRF_TRUSTED_ORIGINS="https://api.sandbox.wagtailspace02.scaf.sixfeetup.com"
-
-     - AWS_S3_CUSTOM_DOMAIN="sandbox.wagtailspace02.scaf.sixfeetup.com"
-
-     - CMS_BACKEND_BASE_URL="https://api.sandbox.wagtailspace02.scaf.sixfeetup.com"
-     - CMS_PUBLIC_BASE_URL="https://api.sandbox.wagtailspace02.scaf.sixfeetup.com"
+- behavior: merge
+  literals:
+  - ENVIRONMENT="sandbox"
+  - DJANGO_SETTINGS_MODULE="config.settings.production"
+  - DJANGO_AWS_STORAGE_BUCKET_NAME="wagtailspace02-sandbox-static-storage"
+  - DJANGO_CSRF_TRUSTED_ORIGINS="https://api.sandbox.wagtailspace02.scaf.sixfeetup.com"
+  - AWS_S3_CUSTOM_DOMAIN="sandbox.wagtailspace02.scaf.sixfeetup.com"
+  - CMS_BACKEND_BASE_URL="https://api.sandbox.wagtailspace02.scaf.sixfeetup.com"
+  - CMS_PUBLIC_BASE_URL="https://api.sandbox.wagtailspace02.scaf.sixfeetup.com"
+  name: app-config
 
 
 images:
-  - name: backend
-    newName: 381492128493.dkr.ecr.us-east-1.amazonaws.com/wagtailspace02-sandbox-backend
-    newTag: latest
-
+- name: backend
+  newName: 381492128493.dkr.ecr.us-east-1.amazonaws.com/wagtailspace02-sandbox-backend
+  newTag: 511ebb6
