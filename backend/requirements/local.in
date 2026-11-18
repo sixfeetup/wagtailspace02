@@ -5,5 +5,5 @@ debugpy
 django-debug-toolbar
 django-extensions
 ipdb
-pydevd-pycharm==243.26053.29
+pydevd-pycharm==263.7307.206
 Werkzeug
