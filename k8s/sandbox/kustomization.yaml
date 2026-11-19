@@ -97,4 +97,4 @@ configMapGenerator:
 images:
 - name: backend
   newName: 381492128493.dkr.ecr.us-east-1.amazonaws.com/wagtailspace02-sandbox-backend
-  newTag: 511ebb6
+  newTag: 203501b
